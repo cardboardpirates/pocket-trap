@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pocket Trap (protótipo de redesign)</title>
 <meta name="description" content="Protótipo de redesign do site da Pocket Trap, estúdio indie de jogos de São Paulo. Não é o site oficial.">
+<link rel="icon" type="image/png" href="assets/images/favicon-32x32.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +17,18 @@
 </head>
 <body>
 
+<!-- TEMPORÁRIO: tela de senha só pra desenvolvimento, remover antes de publicar de verdade. -->
+<div class="dev-gate" id="devGate" role="dialog" aria-modal="true" aria-label="Acesso restrito">
+  <form class="dev-gate-panel" id="devGateForm">
+    <span class="eyebrow">ACESSO RESTRITO</span>
+    <p class="dev-gate-title">Pocket Trap</p>
+    <p class="dev-gate-sub">Protótipo em desenvolvimento. Digite a senha pra continuar.</p>
+    <input type="password" id="devGateInput" class="dev-gate-input" autocomplete="off" aria-label="Senha">
+    <button type="submit" class="btn btn-primary btn-sm">Entrar</button>
+    <p class="dev-gate-error" id="devGateError" hidden>Senha incorreta.</p>
+  </form>
+</div>
+
 <div class="crt" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
 <div id="routeAnnouncer" class="sr-only" role="status" aria-live="polite"></div>
@@ -23,11 +36,7 @@
 <header class="topbar">
   <div class="wrap topbar-inner">
     <button class="logo" id="logoHome" aria-label="Pocket Trap, home">
-      <span class="logo-led" aria-hidden="true"></span>
-      <span>
-        POCKET TRAP
-        <small class="i18n" data-pt="ESTÚDIO DE JOGOS · SP" data-en="GAME STUDIO · SÃO PAULO">ESTÚDIO DE JOGOS · SP</small>
-      </span>
+      <img src="assets/images/PocketTrap_white.png" alt="">
     </button>
 
     <nav>
@@ -54,8 +63,12 @@
 <!-- ===================== HOME ===================== -->
 <main id="view-home" class="view active">
 
-  <section class="hero wrap">
-    <div class="hero-grid">
+  <section class="hero" id="heroMedia">
+    <div class="scene-media" aria-hidden="true">
+      <div class="scene-media-bg" id="heroMediaBg"></div>
+      <img class="scene-media-char" id="heroMediaChar" alt="">
+    </div>
+    <div class="wrap hero-inner">
       <div class="hero-copy">
         <span class="eyebrow i18n" data-pt="EST. 2013 · SÃO PAULO, BRASIL" data-en="EST. 2013 · SÃO PAULO, BRAZIL">EST. 2013 · SÃO PAULO, BRASIL</span>
         <h1 class="i18n-html" tabindex="-1" data-pt="Jogos que não cabem&nbsp;<em>na tela.</em>" data-en="Games too restless&nbsp;<em>to stay put.</em>">Jogos que não cabem <em>na tela.</em></h1>
@@ -67,20 +80,6 @@
           <button class="btn btn-ghost btn-sm" id="bootBtn" type="button">
             <span class="i18n" data-pt="Ligar o console" data-en="Power on">Ligar o console</span>
           </button>
-        </div>
-      </div>
-
-      <div class="hero-screen" id="heroScreen">
-        <div class="boot-glyph">
-          <svg class="console-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="8" y="6" width="48" height="52" rx="10"/>
-            <rect x="17" y="15" width="30" height="18" rx="2"/>
-            <circle cx="22" cy="44" r="3"/>
-            <circle cx="42" cy="44" r="3"/>
-            <circle cx="32" cy="39" r="3"/>
-            <circle cx="32" cy="49" r="3"/>
-          </svg>
-          <span class="i18n" data-pt="POCKET TRAP GAME SYSTEM" data-en="POCKET TRAP GAME SYSTEM">POCKET TRAP GAME SYSTEM</span>
         </div>
       </div>
     </div>
@@ -137,19 +136,17 @@
     </div>
   </section>
 
-  <section class="wrap">
-    <div class="banner reveal">
-      <svg class="banner-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="6" y="12" width="52" height="34" rx="4"/>
-        <path d="M24 52h16M32 46v6"/>
-        <path d="M18 22l6 6-6 6M30 34h10" stroke-width="2"/>
-      </svg>
-      <div>
-        <h3 class="i18n" data-pt="Ninjin virou desenho. Sério." data-en="Ninjin became a cartoon. For real.">Ninjin virou desenho. Sério.</h3>
-        <p class="i18n" data-pt="22 episódios no Cartoon Network e na HBO Max, feitos com Roger Keesse. Acontece que coelhos com machadinho de guerra era mesmo uma boa ideia." data-en="22 episodes on Cartoon Network and HBO Max, made with Roger Keesse. Turns out rabbits with war-hatchets were a great idea all along.">22 episódios no Cartoon Network e na HBO Max, feitos com Roger Keesse. Acontece que coelhos com machadinho de guerra era mesmo uma boa ideia.</p>
-      </div>
-      <a class="btn btn-ghost btn-sm" href="#jogos">
-        <span class="i18n" data-pt="Ver o jogo" data-en="See the game">Ver o jogo</span>
+  <section class="transmedia">
+    <div class="scene-media" aria-hidden="true">
+      <div class="scene-media-bg" style="background-image:url('assets/images/ninjin_cartoon.jpg')"></div>
+    </div>
+    <div class="wrap transmedia-inner">
+      <span class="eyebrow i18n" data-pt="TRANSMEDIA" data-en="TRANSMEDIA">TRANSMEDIA</span>
+      <h2 class="i18n" data-pt="Ninjin virou desenho. Sério." data-en="Ninjin became a cartoon. For real.">Ninjin virou desenho. Sério.</h2>
+      <p class="i18n" data-pt="22 episódios no Cartoon Network e na HBO Max, feitos com Roger Keesse. Acontece que coelhos com machadinho de guerra era mesmo uma boa ideia." data-en="22 episodes on Cartoon Network and HBO Max, made with Roger Keesse. Turns out rabbits with war-hatchets were a great idea all along.">22 episódios no Cartoon Network e na HBO Max, feitos com Roger Keesse. Acontece que coelhos com machadinho de guerra era mesmo uma boa ideia.</p>
+      <img class="transmedia-logo" src="assets/images/logo-ninjin-cartoon.png" alt="Ninjin">
+      <a class="btn btn-ghost btn-sm" href="#serie/ninjin">
+        <span class="i18n" data-pt="Ver a série" data-en="See the series">Ver a série</span>
       </a>
     </div>
   </section>
@@ -212,14 +209,25 @@
   </div>
 </main>
 
+<!-- ===================== SERIES TEMPLATE ===================== -->
+<main id="view-series" class="view">
+  <div class="wrap">
+    <button class="back-link" id="backBtnSeries">
+      <span aria-hidden="true">‹</span>
+      <span class="i18n" data-pt="Voltar ao console" data-en="Back to console">Voltar ao console</span>
+    </button>
+    <div id="seriesContent"></div>
+  </div>
+</main>
+
 <footer>
   <div class="wrap footer-inner">
     <span class="fine-print i18n" data-pt="© 2026 Pocket Trap. Protótipo de redesign (não é o site oficial)." data-en="© 2026 Pocket Trap. Redesign concept (not the official website).">© 2026 Pocket Trap. Protótipo de redesign (não é o site oficial).</span>
     <div class="social-row" aria-label="social links">
       <a href="https://www.facebook.com/PocketTrap" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
       <a href="https://store.steampowered.com/developer/pocket-trap" target="_blank" rel="noopener noreferrer" aria-label="Steam"><i class="fa-brands fa-steam" aria-hidden="true"></i></a>
-      <span class="social-soon" aria-label="Twitter/X — em breve / coming soon" aria-disabled="true" title="Em breve / Coming soon"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></span>
-      <span class="social-soon" aria-label="itch.io — em breve / coming soon" aria-disabled="true" title="Em breve / Coming soon"><i class="fa-brands fa-itch-io" aria-hidden="true"></i></span>
+      <span class="social-soon" aria-label="Twitter/X, em breve / coming soon" aria-disabled="true" title="Em breve / Coming soon"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></span>
+      <span class="social-soon" aria-label="itch.io, em breve / coming soon" aria-disabled="true" title="Em breve / Coming soon"><i class="fa-brands fa-itch-io" aria-hidden="true"></i></span>
     </div>
   </div>
 </footer>

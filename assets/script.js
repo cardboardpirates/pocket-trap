@@ -3,6 +3,37 @@
 
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* ---------- dev gate (TEMPORÁRIO, remover antes de publicar) ---------- */
+  var DEV_GATE_KEY = "pt-dev-unlocked";
+  var DEV_GATE_PASSWORD = "cartucho";
+  var devGate = document.getElementById("devGate");
+  var devGateForm = document.getElementById("devGateForm");
+  var devGateInput = document.getElementById("devGateInput");
+  var devGateError = document.getElementById("devGateError");
+
+  function unlockDevGate(){
+    devGate.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  try {
+    if (localStorage.getItem(DEV_GATE_KEY) === "1") unlockDevGate();
+    else document.body.style.overflow = "hidden";
+  } catch(e){}
+
+  devGateForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    if (devGateInput.value.trim() === DEV_GATE_PASSWORD) {
+      try { localStorage.setItem(DEV_GATE_KEY, "1"); } catch(e){}
+      devGateError.hidden = true;
+      unlockDevGate();
+    } else {
+      devGateError.hidden = false;
+      devGateInput.value = "";
+      devGateInput.focus();
+    }
+  });
+
   /* ---------- i18n ---------- */
   var LANG_KEY = "pt-lang-pref";
   var lang = "pt";
@@ -22,6 +53,7 @@
       btn.setAttribute("aria-pressed", btn.dataset.lang === lang ? "true" : "false");
     });
     if (currentGame) renderGame(currentGame);
+    if (currentSeries) renderSeries(currentSeries);
   }
 
   document.querySelectorAll(".lang-toggle button").forEach(function(btn){
@@ -84,6 +116,8 @@
       year: "2018",
       tag: { pt: "AÇÃO · AVENTURA", en: "ACTION · ADVENTURE" },
       screenshot: null,
+      trailer: "xY1WyZC89_c",
+      logo: "assets/images/logo-ninjin.png",
       title: "Ninjin: Clash of Carrots",
       tagline: { pt: "Ação e humor numa fazenda de cenouras que virou campo de batalha.", en: "Action and humor in a carrot farm turned battlefield." },
       synopsis: [
@@ -112,6 +146,10 @@
       year: "2020",
       tag: { pt: "RPG DE AÇÃO", en: "ACTION RPG" },
       screenshot: null,
+      trailer: "P9h1g-nvTnY",
+      logo: "assets/images/dodgeball-logo.png",
+      background: "assets/images/background_dodgeball-1-web.jpg",
+      character: "assets/images/Otto_char.png",
       title: "Dodgeball Academia",
       tagline: { pt: "Num mundo onde dodgeball é vida, um garoto sonha em virar lenda.", en: "In a world where dodgeball is life, one kid dreams of becoming a legend." },
       synopsis: [
@@ -140,6 +178,10 @@
       year: "2025",
       tag: { pt: "YOYOVANIA", en: "YOYOVANIA" },
       screenshot: null,
+      trailer: "iBRiczTqy_8",
+      logo: "assets/images/logo_pipistrello_white.png",
+      background: "assets/images/background_pipis-1-web.jpg",
+      character: "assets/images/Pippit_char-web.png",
       title: "Pipistrello and the Cursed Yoyo",
       tagline: { pt: "Um morcego, um ioiô amaldiçoado, e um console que nunca existiu.", en: "A bat, a cursed yoyo, and a console that never existed." },
       synopsis: [
@@ -164,6 +206,36 @@
       ]
     }
   };
+
+  /* ---------- home hero carousel ---------- */
+  var HERO_SLIDES = Object.keys(GAMES).map(function(id){ return GAMES[id]; })
+    .filter(function(g){ return g.background && g.character; });
+  var heroMediaBg = document.getElementById("heroMediaBg");
+  var heroMediaChar = document.getElementById("heroMediaChar");
+  var heroSlideIndex = 0;
+
+  function applyHeroSlide(i){
+    var slide = HERO_SLIDES[i];
+    if (!slide) return;
+    heroMediaBg.style.backgroundImage = "url('" + slide.background + "')";
+    heroMediaChar.src = slide.character;
+  }
+
+  if (HERO_SLIDES.length) {
+    applyHeroSlide(0);
+    if (HERO_SLIDES.length > 1 && !reduceMotion) {
+      window.setInterval(function(){
+        heroMediaBg.style.opacity = 0;
+        heroMediaChar.style.opacity = 0;
+        window.setTimeout(function(){
+          heroSlideIndex = (heroSlideIndex + 1) % HERO_SLIDES.length;
+          applyHeroSlide(heroSlideIndex);
+          heroMediaBg.style.opacity = 1;
+          heroMediaChar.style.opacity = 1;
+        }, 500);
+      }, 7000);
+    }
+  }
 
   /* Ícones reais do Font Awesome (CDN carregado no <head> do index.html). O
      Font Awesome Free não publica um ícone oficial de Nintendo/Switch, então
@@ -198,9 +270,12 @@
     '</svg>';
 
   var currentGame = null;
+  var currentSeries = null;
   var viewHome = document.getElementById("view-home");
   var viewGame = document.getElementById("view-game");
+  var viewSeries = document.getElementById("view-series");
   var gameContent = document.getElementById("gameContent");
+  var seriesContent = document.getElementById("seriesContent");
   var routeAnnouncer = document.getElementById("routeAnnouncer");
 
   function announceRoute(msg){
@@ -213,36 +288,61 @@
     if (h) h.focus({ preventScroll: true });
   }
 
+  function showView(view){
+    [viewHome, viewGame, viewSeries].forEach(function(v){ v.classList.toggle("active", v === view); });
+  }
+
   function renderGame(id){
     var g = GAMES[id];
     if (!g) return;
     var storeUrl = g.platforms[0].url;
+    var hasScene = !!(g.background && g.character);
     var screenInner = g.screenshot
       ? '<img src="' + g.screenshot + '" alt="' + g.title + '">'
       : '<div class="game-console-placeholder">' +
           CONSOLE_GLYPH_SVG +
           '<span>' + (lang === "pt" ? "Aguardando cartucho" : "Awaiting cartridge") + '</span>' +
         '</div>';
-    gameContent.innerHTML =
+    var gameHeroCopy =
+      '<div class="game-hero-copy">' +
+        '<div class="game-hero-meta">' +
+          '<span class="game-badge">CART. ' + g.year + '</span>' +
+          '<span class="game-genre">' + (GENRE_ICONS[id] || '') + '<span>' + g.tag[lang] + '</span></span>' +
+        '</div>' +
+        '<h1 tabindex="-1"><img class="game-logo" src="' + g.logo + '" alt="' + g.title + '"></h1>' +
+        '<p class="game-tagline">' + g.tagline[lang] + '</p>' +
+        '<a class="btn btn-primary game-hero-cta" href="#plataformas">' +
+          '<span>' + (lang === "pt" ? "Ver onde comprar" : "See where to buy") + '</span>' +
+        '</a>' +
+      '</div>';
+    var gameHeroMarkup = hasScene ?
+      '<div class="game-hero game-hero--scene" style="--gc1:' + g.color + '">' +
+        '<div class="scene-media" aria-hidden="true">' +
+          '<div class="scene-media-bg" style="background-image:url(\'' + g.background + '\')"></div>' +
+          '<img class="scene-media-char" src="' + g.character + '" alt="">' +
+        '</div>' +
+        '<div class="wrap game-hero-inner">' + gameHeroCopy + '</div>' +
+      '</div>'
+    :
       '<div class="game-hero" style="--gc1:' + g.color + '">' +
         '<div class="game-hero-inner">' +
-          '<div class="game-hero-copy">' +
-            '<div class="game-hero-meta">' +
-              '<span class="game-badge">CART. ' + g.year + '</span>' +
-              '<span class="game-genre">' + (GENRE_ICONS[id] || '') + '<span>' + g.tag[lang] + '</span></span>' +
-            '</div>' +
-            '<h1 tabindex="-1">' + g.title + '</h1>' +
-            '<p class="game-tagline">' + g.tagline[lang] + '</p>' +
-            '<a class="btn btn-primary game-hero-cta" href="#plataformas">' +
-              '<span>' + (lang === "pt" ? "Ver onde comprar" : "See where to buy") + '</span>' +
-            '</a>' +
-          '</div>' +
+          gameHeroCopy +
           '<div class="game-console">' +
             '<div class="game-console-screen">' + screenInner + '</div>' +
             '<div class="game-console-dots"><span></span><span></span><span></span><span></span></div>' +
           '</div>' +
         '</div>' +
-      '</div>' +
+      '</div>';
+    gameContent.innerHTML =
+      gameHeroMarkup +
+      (g.trailer ?
+        '<div class="game-trailer" style="--gc1:' + g.color + '">' +
+          '<span class="eyebrow">TRAILER</span>' +
+          '<div class="game-trailer-frame">' +
+            '<iframe src="https://www.youtube-nocookie.com/embed/' + g.trailer + '" title="' + g.title + (lang === "pt" ? ", trailer" : ", trailer") + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
+          '</div>' +
+        '</div>'
+      : '') +
       '<div class="game-body">' +
         '<div class="game-synopsis">' +
           g.synopsis.map(function(p){ return '<p>' + p[lang] + '</p>'; }).join('') +
@@ -266,7 +366,7 @@
           '<div class="store-note">' +
             '<p>' + (lang === "pt" ? "Quer ver o jogo rodando antes? As capturas de tela oficiais estão na loja." : "Want to see it running first? Official screenshots are on the store page.") + '</p>' +
             '<a class="btn btn-ghost btn-sm" href="' + storeUrl + '" target="_blank" rel="noopener noreferrer">' +
-              '<span>' + (lang === "pt" ? "Ver na loja" : "See on the store") + '</span>' +
+              '<span>' + (lang === "pt" ? "Ver capturas na loja" : "See screenshots on the store") + '</span>' +
               EXT_ICON +
             '</a>' +
           '</div>' +
@@ -290,12 +390,81 @@
       '</div>';
   }
 
+  /* ---------- transmedia (série animada) ---------- */
+  var SERIES = {
+    ninjin: {
+      color: "var(--ninjin)",
+      background: "assets/images/ninjin_cartoon.jpg",
+      logo: "assets/images/logo-ninjin-cartoon.png",
+      title: "Ninjin Animated Series",
+      meta: [
+        { pt: "Criada por Pocket Trap e Roger Keesse", en: "Created by Pocket Trap and Roger Keesse" },
+        { pt: "10×1', 7×3', 12×7' (série em andamento)", en: "10×1', 7×3', 12×7' (ongoing series)" },
+        { pt: "Co-produção Birdo, Cartoon Network e Pocket Trap", en: "Co-production Birdo, Cartoon Network and Pocket Trap" }
+      ],
+      synopsis: [
+        { pt: "NINJIN é uma série de ação e comédia com jeitão de anime, co-produzida pelo estúdio de jogos Pocket Trap, a Birdo Studio e a Cartoon Network Brasil, se passando no mesmo universo do jogo Ninjin: Clash of Carrots. A série tem 22 episódios divididos em 3 formatos: dez episódios de 1 minuto, sete de 3 minutos e uma série contínua de episódios de 7 minutos.", en: "NINJIN is a character-driven, anime inspired, action comedy animated series co-produced by the game studio Pocket Trap, Birdo Studio and Cartoon Network Brasil, taking place in the same universe as the video game Ninjin: Clash of Carrots. The series features 22 episodes, divided in 3 different formats: ten 1-minute-long episodes, seven 3-minute-long episodes and an ongoing series of 7-minute-long episodes." },
+        { pt: "A história acompanha NINJIN, um coelhinho que só pensa numa coisa: virar um ninja mestre digno de dar pancada, como seus ancestrais foram antigamente. Ao lado dos amigos AKAI, a raposa afobada, e FLINK, o sapo preguiçoso, eles treinam com um COELHO ANCIÃO SENSEI (o maior doido da região) e enfrentam as situações mais absurdas e fora de controle.", en: "The story is focused on NINJIN, a rabbit cub who only cares about one thing: becoming an ass-kicking ninja master, just like his ancestors used to be in the days of yore. Alongside his pals, the frantic fox AKAI and the lazy frog FLINK, they will not only train under an ELDER RABBIT SENSEI, the real screwball around those parts, but will also face the most absurd, insane and out of control situations." }
+      ],
+      availability: { pt: "Assista à série do Ninjin no Cartoon Network e na HBO Max!", en: "You can watch the Ninjin series on Cartoon Network and HBO Max!" },
+      availabilityNote: { pt: "Disponível só na América Latina, por enquanto.", en: "Available only in Latin America at the moment." },
+      trailer: "0eqU8MaedXE",
+      closing: {
+        background: "assets/images/Ninjin_HQ-1.jpg",
+        text: { pt: "Quer conhecer o jogo que deu origem a essa bagunça toda?", en: "Want to check out the game that started all this mess?" },
+        ctaHref: "#jogo/ninjin",
+        cta: { pt: "Ver o jogo", en: "See the game" }
+      }
+    }
+  };
+
+  function renderSeries(id){
+    var s = SERIES[id];
+    if (!s) return;
+    seriesContent.innerHTML =
+      '<div class="game-hero game-hero--scene transmedia-hero" style="--gc1:' + s.color + '">' +
+        '<div class="scene-media" aria-hidden="true">' +
+          '<div class="scene-media-bg" style="background-image:url(\'' + s.background + '\')"></div>' +
+        '</div>' +
+        '<div class="wrap game-hero-inner">' +
+          '<div class="game-hero-copy">' +
+            '<h1 tabindex="-1"><img class="game-logo" src="' + s.logo + '" alt="' + s.title + '"></h1>' +
+            '<ul class="series-meta">' +
+              s.meta.map(function(m){ return '<li>' + m[lang] + '</li>'; }).join('') +
+            '</ul>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="wrap series-synopsis">' +
+        s.synopsis.map(function(p){ return '<p>' + p[lang] + '</p>'; }).join('') +
+        '<p class="series-availability">' + s.availability[lang] + '</p>' +
+        '<p class="series-availability-note">' + s.availabilityNote[lang] + '</p>' +
+      '</div>' +
+      (s.trailer ?
+        '<div class="game-trailer" style="--gc1:' + s.color + '">' +
+          '<span class="eyebrow">TRAILER</span>' +
+          '<div class="game-trailer-frame">' +
+            '<iframe src="https://www.youtube-nocookie.com/embed/' + s.trailer + '" title="' + s.title + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
+          '</div>' +
+        '</div>'
+      : '') +
+      (s.closing ?
+        '<div class="transmedia-closing">' +
+          '<div class="scene-media" aria-hidden="true"><div class="scene-media-bg" style="background-image:url(\'' + s.closing.background + '\')"></div></div>' +
+          '<div class="wrap transmedia-closing-inner">' +
+            '<p>' + s.closing.text[lang] + '</p>' +
+            '<a class="btn btn-primary btn-sm" href="' + s.closing.ctaHref + '"><span>' + s.closing.cta[lang] + '</span></a>' +
+          '</div>' +
+        '</div>'
+      : '');
+  }
+
   function openGame(id, opts){
     opts = opts || {};
+    currentSeries = null;
     currentGame = id;
     renderGame(id);
-    viewHome.classList.remove("active");
-    viewGame.classList.add("active");
+    showView(viewGame);
     if (!reduceMotion) {
       viewGame.classList.remove("booting");
       void viewGame.offsetWidth;
@@ -312,8 +481,7 @@
   function closeGame(opts){
     opts = opts || {};
     currentGame = null;
-    viewGame.classList.remove("active");
-    viewHome.classList.add("active");
+    showView(viewHome);
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
     focusHeading(viewHome);
     announceRoute(lang === "pt" ? "Voltou para a página inicial" : "Back to the home page");
@@ -322,20 +490,61 @@
     }
   }
 
-  /* ---------- hash routing: back/refresh/deep-link to a game page ---------- */
+  function openSeries(id, opts){
+    opts = opts || {};
+    currentGame = null;
+    currentSeries = id;
+    renderSeries(id);
+    showView(viewSeries);
+    if (!reduceMotion) {
+      viewSeries.classList.remove("booting");
+      void viewSeries.offsetWidth;
+      viewSeries.classList.add("booting");
+    }
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    focusHeading(viewSeries);
+    announceRoute((lang === "pt" ? "Agora vendo: " : "Now viewing: ") + SERIES[id].title);
+    if (!opts.fromHash && location.hash !== "#serie/" + id) {
+      location.hash = "serie/" + id;
+    }
+  }
+
+  function closeSeries(opts){
+    opts = opts || {};
+    currentSeries = null;
+    showView(viewHome);
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    focusHeading(viewHome);
+    announceRoute(lang === "pt" ? "Voltou para a página inicial" : "Back to the home page");
+    if (!opts.fromHash && location.hash) {
+      history.pushState("", document.title, location.pathname + location.search);
+    }
+  }
+
+  function goHome(){
+    if (currentGame) closeGame();
+    if (currentSeries) closeSeries();
+  }
+
+  /* ---------- hash routing: back/refresh/deep-link to a game or series page ---------- */
   function syncFromHash(){
-    var m = /^#jogo\/([a-z]+)/.exec(location.hash);
-    if (m && GAMES[m[1]]) {
-      if (currentGame !== m[1]) openGame(m[1], { fromHash: true });
-    } else if (!location.hash && currentGame) {
-      /* only close on an EMPTY hash — a same-page anchor like #plataformas
+    var gm = /^#jogo\/([a-z]+)/.exec(location.hash);
+    var sm = /^#serie\/([a-z]+)/.exec(location.hash);
+    if (gm && GAMES[gm[1]]) {
+      if (currentGame !== gm[1]) openGame(gm[1], { fromHash: true });
+    } else if (sm && SERIES[sm[1]]) {
+      if (currentSeries !== sm[1]) openSeries(sm[1], { fromHash: true });
+    } else if (!location.hash && (currentGame || currentSeries)) {
+      /* only close on an EMPTY hash: a same-page anchor like #plataformas
          (e.g. the "Ver onde comprar" button) must not be treated as "leave the game page" */
-      closeGame({ fromHash: true });
-    } else if (m && !GAMES[m[1]]) {
-      /* well-formed #jogo/ hash but unknown id: drop the dead hash and land
-         on Home instead of leaving a frozen page with no feedback */
+      if (currentGame) closeGame({ fromHash: true });
+      if (currentSeries) closeSeries({ fromHash: true });
+    } else if ((gm && !GAMES[gm[1]]) || (sm && !SERIES[sm[1]])) {
+      /* well-formed #jogo/ or #serie/ hash but unknown id: drop the dead hash and
+         land on Home instead of leaving a frozen page with no feedback */
       history.replaceState("", document.title, location.pathname + location.search);
       if (currentGame) closeGame({ fromHash: true });
+      if (currentSeries) closeSeries({ fromHash: true });
     }
   }
   window.addEventListener("hashchange", syncFromHash);
@@ -344,7 +553,8 @@
     card.addEventListener("click", function(){ openGame(card.dataset.game); });
   });
   document.getElementById("backBtn").addEventListener("click", function(){ closeGame(); });
-  document.getElementById("logoHome").addEventListener("click", function(){ closeGame(); });
+  document.getElementById("backBtnSeries").addEventListener("click", function(){ closeSeries(); });
+  document.getElementById("logoHome").addEventListener("click", goHome);
 
   /* ---------- easter egg: konami code ---------- */
   var seq = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
