@@ -83,6 +83,7 @@
       color: "var(--ninjin)",
       year: "2018",
       tag: { pt: "AÇÃO · AVENTURA", en: "ACTION · ADVENTURE" },
+      screenshot: null,
       title: "Ninjin: Clash of Carrots",
       tagline: { pt: "Ação e humor numa fazenda de cenouras que virou campo de batalha.", en: "Action and humor in a carrot farm turned battlefield." },
       synopsis: [
@@ -110,6 +111,7 @@
       color: "var(--dodge)",
       year: "2020",
       tag: { pt: "RPG DE AÇÃO", en: "ACTION RPG" },
+      screenshot: null,
       title: "Dodgeball Academia",
       tagline: { pt: "Num mundo onde dodgeball é vida, um garoto sonha em virar lenda.", en: "In a world where dodgeball is life, one kid dreams of becoming a legend." },
       synopsis: [
@@ -137,6 +139,7 @@
       color: "var(--pipi)",
       year: "2025",
       tag: { pt: "YOYOVANIA", en: "YOYOVANIA" },
+      screenshot: null,
       title: "Pipistrello and the Cursed Yoyo",
       tagline: { pt: "Um morcego, um ioiô amaldiçoado, e um console que nunca existiu.", en: "A bat, a cursed yoyo, and a console that never existed." },
       synopsis: [
@@ -173,6 +176,27 @@
   };
   var EXT_ICON = '<i class="fa-solid fa-arrow-up-right-from-square pb-go" aria-hidden="true"></i>';
 
+  /* Glifos de gênero: um ícone de linha por jogo (mesmo estilo dos SVGs
+     autorais já usados no console-icon/banner-icon/cart-cta), pra reforçar
+     visualmente o gênero de cada cartucho, não só em texto. */
+  var GENRE_ICONS = {
+    ninjin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 11c2-2 4-4 6-6 1.8 1.8 1.8 4.2 0 6l-4 4"/><path d="M13 11L4 20"/></svg>',
+    dodgeball: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4c-2.8 3-2.8 13 0 16M4 12c3-2.8 13-2.8 16 0"/></svg>',
+    pipistrello: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><circle cx="12" cy="17" r="4"/><path d="M12 11v2"/></svg>'
+  };
+
+  /* Mesmo glifo do console usado no boot-glyph da Home (index.html), aqui
+     reaproveitado dentro da moldura de tela de cada página de jogo. */
+  var CONSOLE_GLYPH_SVG =
+    '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<rect x="8" y="6" width="48" height="52" rx="10"/>' +
+      '<rect x="17" y="15" width="30" height="18" rx="2"/>' +
+      '<circle cx="22" cy="44" r="3"/>' +
+      '<circle cx="42" cy="44" r="3"/>' +
+      '<circle cx="32" cy="39" r="3"/>' +
+      '<circle cx="32" cy="49" r="3"/>' +
+    '</svg>';
+
   var currentGame = null;
   var viewHome = document.getElementById("view-home");
   var viewGame = document.getElementById("view-game");
@@ -182,14 +206,31 @@
     var g = GAMES[id];
     if (!g) return;
     var storeUrl = g.platforms[0].url;
+    var screenInner = g.screenshot
+      ? '<img src="' + g.screenshot + '" alt="' + g.title + '">'
+      : '<div class="game-console-placeholder">' +
+          CONSOLE_GLYPH_SVG +
+          '<span>' + (lang === "pt" ? "Aguardando cartucho" : "Awaiting cartridge") + '</span>' +
+        '</div>';
     gameContent.innerHTML =
       '<div class="game-hero" style="--gc1:' + g.color + '">' +
-        '<span class="game-badge">CART. ' + g.year + '</span>' +
-        '<h1>' + g.title + '</h1>' +
-        '<p class="game-tagline">' + g.tagline[lang] + '</p>' +
-        '<a class="btn btn-primary game-hero-cta" href="#plataformas">' +
-          '<span>' + (lang === "pt" ? "Ver onde comprar" : "See where to buy") + '</span>' +
-        '</a>' +
+        '<div class="game-hero-inner">' +
+          '<div class="game-hero-copy">' +
+            '<div class="game-hero-meta">' +
+              '<span class="game-badge">CART. ' + g.year + '</span>' +
+              '<span class="game-genre">' + (GENRE_ICONS[id] || '') + '<span>' + g.tag[lang] + '</span></span>' +
+            '</div>' +
+            '<h1>' + g.title + '</h1>' +
+            '<p class="game-tagline">' + g.tagline[lang] + '</p>' +
+            '<a class="btn btn-primary game-hero-cta" href="#plataformas">' +
+              '<span>' + (lang === "pt" ? "Ver onde comprar" : "See where to buy") + '</span>' +
+            '</a>' +
+          '</div>' +
+          '<div class="game-console">' +
+            '<div class="game-console-screen">' + screenInner + '</div>' +
+            '<div class="game-console-dots"><span></span><span></span><span></span><span></span></div>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="game-body">' +
         '<div class="game-synopsis">' +
