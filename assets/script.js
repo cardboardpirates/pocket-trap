@@ -188,7 +188,7 @@
         '<h1>' + g.title + '</h1>' +
         '<p class="game-tagline">' + g.tagline[lang] + '</p>' +
         '<a class="btn btn-primary game-hero-cta" href="#plataformas">' +
-          '<span>' + (lang === "pt" ? "Comprar agora" : "Buy now") + '</span>' +
+          '<span>' + (lang === "pt" ? "Ver onde comprar" : "See where to buy") + '</span>' +
         '</a>' +
       '</div>' +
       '<div class="game-body">' +
@@ -199,7 +199,7 @@
           '</ul>' +
           '<div class="reviews-block">' +
             '<div class="reviews-head">' +
-              '<h4>' + (lang === "pt" ? "O QUE JOGADORES DIZEM NA STEAM" : "WHAT PLAYERS SAY ON STEAM") + '</h4>' +
+              '<h2>' + (lang === "pt" ? "O QUE JOGADORES DIZEM NA STEAM" : "WHAT PLAYERS SAY ON STEAM") + '</h2>' +
               '<a href="' + storeUrl + '#app_reviews_hash" target="_blank" rel="noopener noreferrer">' + (lang === "pt" ? "ver mais" : "see more") + '</a>' +
             '</div>' +
             '<div class="review-grid">' +
@@ -221,7 +221,7 @@
         '</div>' +
         '<div class="game-side">' +
           '<div class="info-card info-card--primary" id="plataformas">' +
-            '<h4>' + (lang === "pt" ? "PLATAFORMAS" : "PLATFORMS") + '</h4>' +
+            '<h2>' + (lang === "pt" ? "PLATAFORMAS" : "PLATFORMS") + '</h2>' +
             '<div class="platform-badges">' + g.platforms.map(function(p){
               return '<a class="platform-badge" href="' + p.url + '" target="_blank" rel="noopener noreferrer">' +
                 (PLATFORM_ICONS[p.key] || '') +
@@ -231,7 +231,7 @@
             }).join('') + '</div>' +
           '</div>' +
           '<div class="info-card">' +
-            '<h4>' + (lang === "pt" ? "DESENVOLVEDOR" : "DEVELOPER") + '</h4>' +
+            '<h2>' + (lang === "pt" ? "DESENVOLVEDOR" : "DEVELOPER") + '</h2>' +
             '<p style="color:var(--ink-dim);font-size:.9rem">Pocket Trap · São Paulo, Brasil</p>' +
           '</div>' +
         '</div>' +
@@ -273,8 +273,13 @@
       if (currentGame !== m[1]) openGame(m[1], { fromHash: true });
     } else if (!location.hash && currentGame) {
       /* only close on an EMPTY hash — a same-page anchor like #plataformas
-         (e.g. the "Comprar agora" button) must not be treated as "leave the game page" */
+         (e.g. the "Ver onde comprar" button) must not be treated as "leave the game page" */
       closeGame({ fromHash: true });
+    } else if (m && !GAMES[m[1]]) {
+      /* well-formed #jogo/ hash but unknown id: drop the dead hash and land
+         on Home instead of leaving a frozen page with no feedback */
+      history.replaceState("", document.title, location.pathname + location.search);
+      if (currentGame) closeGame({ fromHash: true });
     }
   }
   window.addEventListener("hashchange", syncFromHash);
