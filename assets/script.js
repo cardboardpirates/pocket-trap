@@ -99,6 +99,11 @@
         { key: "switch", label: "Nintendo Switch", url: "https://www.nintendo.com/us/store/products/ninjin-clash-of-carrots-switch/" },
         { key: "playstation", label: "PlayStation 4", url: "https://store.playstation.com/en-us/product/UP4735-CUSA12847_00-NINJINBASEGAME01" },
         { key: "xbox", label: "Xbox One", url: "https://www.xbox.com/en-US/games/store/ninjin-clash-of-carrots/bpn65mshs43g" }
+      ],
+      reviews: [
+        { author: "Gamal Medhat", quote: "Ninjin: Clash of Carrots is definitely one of the best indie games ever made." },
+        { author: "Allan Smith", quote: "I can't even remember the last game that gave me such... honest fun." },
+        { author: "Specs The Wolf", quote: "I find this game to be very enjoyable. The gameplay is unique and intuitive." }
       ]
     },
     dodgeball: {
@@ -121,6 +126,11 @@
         { key: "switch", label: "Nintendo Switch", url: "https://www.nintendo.com/us/store/products/dodgeball-academia-switch/" },
         { key: "playstation", label: "PlayStation 4/5", url: "https://store.playstation.com/en-us/product/UP3864-CUSA27737_00-DODGEBALLACA000A/" },
         { key: "xbox", label: "Xbox One / Series", url: "https://www.xbox.com/en-US/games/store/dodgeball-academia/9nbhqsq3621m" }
+      ],
+      reviews: [
+        { author: "Tiwill", quote: "A straight-up fun time. Pure joy." },
+        { author: "Chriziel", quote: "Charming and beautiful game with an easy to follow humor filled story." },
+        { author: "IcewaterCreek", quote: "Dodgeball Academia is a light game fun for the whole family." }
       ]
     },
     pipistrello: {
@@ -143,6 +153,11 @@
         { key: "switch", label: "Nintendo Switch / Switch 2", url: "https://www.nintendo.com/us/store/products/pipistrello-and-the-cursed-yoyo-switch/" },
         { key: "playstation", label: "PlayStation 4/5", url: "https://store.playstation.com/en-us/concept/10011382/" },
         { key: "xbox", label: "Xbox One / Series", url: "https://www.xbox.com/en-US/games/store/pipistrello-and-the-cursed-yoyo/9N9LK61WS2CH" }
+      ],
+      reviews: [
+        { author: "umbrellaphant", quote: "The best Nintendo game Nintendo never made." },
+        { author: "Tanwolly", quote: "This is without question the most underrated game I have ever played in my life." },
+        { author: "Stere", quote: "This game is up there with the best Zelda-likes, no doubt about it." }
       ]
     }
   };
@@ -163,17 +178,18 @@
   var viewGame = document.getElementById("view-game");
   var gameContent = document.getElementById("gameContent");
 
-  function shotLabel(){ return lang === "pt" ? "CAPTURA DE TELA" : "SCREENSHOT"; }
-  function moreLabel(){ return lang === "pt" ? "EM BREVE" : "COMING SOON"; }
-
   function renderGame(id){
     var g = GAMES[id];
     if (!g) return;
+    var storeUrl = g.platforms[0].url;
     gameContent.innerHTML =
       '<div class="game-hero" style="--gc1:' + g.color + '">' +
         '<span class="game-badge">CART. ' + g.year + '</span>' +
         '<h1>' + g.title + '</h1>' +
         '<p class="game-tagline">' + g.tagline[lang] + '</p>' +
+        '<a class="btn btn-primary game-hero-cta" href="#plataformas">' +
+          '<span>' + (lang === "pt" ? "Comprar agora" : "Buy now") + '</span>' +
+        '</a>' +
       '</div>' +
       '<div class="game-body">' +
         '<div class="game-synopsis">' +
@@ -181,12 +197,30 @@
           '<ul class="feature-list">' +
             g.features.map(function(f){ return '<li>' + f[lang] + '</li>'; }).join('') +
           '</ul>' +
-          '<div class="shot-grid">' +
-            [1,2,3].map(function(){ return '<div class="shot">' + shotLabel() + '<br>' + moreLabel() + '</div>'; }).join('') +
+          '<div class="reviews-block">' +
+            '<div class="reviews-head">' +
+              '<h4>' + (lang === "pt" ? "O QUE JOGADORES DIZEM NA STEAM" : "WHAT PLAYERS SAY ON STEAM") + '</h4>' +
+              '<a href="' + storeUrl + '#app_reviews_hash" target="_blank" rel="noopener noreferrer">' + (lang === "pt" ? "ver mais" : "see more") + '</a>' +
+            '</div>' +
+            '<div class="review-grid">' +
+              g.reviews.map(function(rv){
+                return '<blockquote class="review-card">' +
+                  '<p>' + rv.quote + '</p>' +
+                  '<footer class="review-author"><i class="fa-brands fa-steam" aria-hidden="true"></i><span>' + rv.author + '</span><span class="review-via">' + (lang === "pt" ? "via Steam (EN)" : "via Steam") + '</span></footer>' +
+                '</blockquote>';
+              }).join('') +
+            '</div>' +
+          '</div>' +
+          '<div class="store-note">' +
+            '<p>' + (lang === "pt" ? "Quer ver o jogo rodando antes? As capturas de tela oficiais estão na loja." : "Want to see it running first? Official screenshots are on the store page.") + '</p>' +
+            '<a class="btn btn-ghost btn-sm" href="' + storeUrl + '" target="_blank" rel="noopener noreferrer">' +
+              '<span>' + (lang === "pt" ? "Ver na loja" : "See on the store") + '</span>' +
+              EXT_ICON +
+            '</a>' +
           '</div>' +
         '</div>' +
         '<div class="game-side">' +
-          '<div class="info-card">' +
+          '<div class="info-card info-card--primary" id="plataformas">' +
             '<h4>' + (lang === "pt" ? "PLATAFORMAS" : "PLATFORMS") + '</h4>' +
             '<div class="platform-badges">' + g.platforms.map(function(p){
               return '<a class="platform-badge" href="' + p.url + '" target="_blank" rel="noopener noreferrer">' +
@@ -204,7 +238,8 @@
       '</div>';
   }
 
-  function openGame(id){
+  function openGame(id, opts){
+    opts = opts || {};
     currentGame = id;
     renderGame(id);
     viewHome.classList.remove("active");
@@ -215,20 +250,40 @@
       viewGame.classList.add("booting");
     }
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    if (!opts.fromHash && location.hash !== "#jogo/" + id) {
+      location.hash = "jogo/" + id;
+    }
   }
 
-  function closeGame(){
+  function closeGame(opts){
+    opts = opts || {};
     currentGame = null;
     viewGame.classList.remove("active");
     viewHome.classList.add("active");
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    if (!opts.fromHash && location.hash) {
+      history.pushState("", document.title, location.pathname + location.search);
+    }
   }
+
+  /* ---------- hash routing: back/refresh/deep-link to a game page ---------- */
+  function syncFromHash(){
+    var m = /^#jogo\/([a-z]+)/.exec(location.hash);
+    if (m && GAMES[m[1]]) {
+      if (currentGame !== m[1]) openGame(m[1], { fromHash: true });
+    } else if (!location.hash && currentGame) {
+      /* only close on an EMPTY hash — a same-page anchor like #plataformas
+         (e.g. the "Comprar agora" button) must not be treated as "leave the game page" */
+      closeGame({ fromHash: true });
+    }
+  }
+  window.addEventListener("hashchange", syncFromHash);
 
   document.querySelectorAll(".cart").forEach(function(card){
     card.addEventListener("click", function(){ openGame(card.dataset.game); });
   });
-  document.getElementById("backBtn").addEventListener("click", closeGame);
-  document.getElementById("logoHome").addEventListener("click", closeGame);
+  document.getElementById("backBtn").addEventListener("click", function(){ closeGame(); });
+  document.getElementById("logoHome").addEventListener("click", function(){ closeGame(); });
 
   /* ---------- easter egg: konami code ---------- */
   var seq = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
@@ -257,4 +312,5 @@
   });
 
   applyLang();
+  syncFromHash();
 })();

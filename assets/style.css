@@ -122,9 +122,11 @@ img{max-width:100%;display:block}
   display:flex;border:1px solid var(--line-strong);border-radius:999px;padding:3px;background:var(--surface);
 }
 .lang-toggle button{
-  border:none;background:none;color:var(--ink-faint);
+  border:none;background:none;color:var(--ink-dim);
   font-family:var(--f-pixel);font-size:.6rem;letter-spacing:.05em;
-  padding:.45rem .7rem;border-radius:999px;transition:all .15s ease;
+  padding:.7rem .9rem;min-height:44px;min-width:44px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:999px;transition:all .15s ease;
 }
 .lang-toggle button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 
@@ -352,13 +354,16 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
   padding-block:2.2rem;
 }
 .social-row{display:flex;gap:.6rem}
-.social-row a{
-  width:38px;height:38px;border-radius:10px;border:1px solid var(--line-strong);
+.social-row a, .social-row .social-soon{
+  width:44px;height:44px;border-radius:10px;border:1px solid var(--line-strong);
   display:flex;align-items:center;justify-content:center;
   font-size:.95rem;text-decoration:none;color:var(--ink-dim);
   transition:all .15s ease;
 }
 .social-row a:hover{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
+.social-row .social-soon{
+  color:var(--ink-faint);border-style:dashed;cursor:default;opacity:.7;
+}
 .fine-print{font-size:.8rem;color:var(--ink-faint)}
 
 /* ---------- game view ---------- */
@@ -391,7 +396,9 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
   display:inline-block;padding:.5rem .8rem;border-radius:8px;margin-bottom:1.2rem;position:relative;z-index:1;
 }
 .game-hero h1{font-size:clamp(2.1rem,4.5vw,3.6rem);position:relative;z-index:1;margin-bottom:.6rem}
-.game-tagline{font-size:1.15rem;color:var(--ink-dim);max-width:52ch;position:relative;z-index:1}
+.game-tagline{font-size:1.15rem;color:var(--ink-dim);max-width:52ch;position:relative;z-index:1;margin-bottom:1.6rem}
+.game-hero-cta{position:relative;z-index:1;background:var(--gc1);color:var(--bg-2)}
+.game-hero-cta:hover{box-shadow:0 0 0 4px color-mix(in srgb, var(--gc1) 30%, transparent)}
 
 .game-body{
   display:grid;grid-template-columns:1.3fr .9fr;gap:clamp(2rem,4vw,3.5rem);
@@ -407,6 +414,7 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
 
 .game-side{display:flex;flex-direction:column;gap:1.6rem}
 .info-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:1.4rem}
+.info-card--primary{border-color:var(--gc1);scroll-margin-top:90px}
 .info-card h4{font-family:var(--f-pixel);font-size:.65rem;color:var(--ink-faint);letter-spacing:.06em;margin-bottom:.9rem}
 .platform-badges{display:flex;flex-direction:column;gap:.55rem}
 .platform-badge{
@@ -423,13 +431,30 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
 .platform-badge .pb-name{flex:1}
 .platform-badge .pb-go{font-size:.7rem;flex:none;opacity:.6}
 
-.shot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-top:2rem}
-.shot{
-  aspect-ratio:16/10;border:1px dashed var(--line-strong);border-radius:var(--radius-sm);
-  display:flex;align-items:center;justify-content:center;color:var(--ink-faint);
-  font-family:var(--f-pixel);font-size:.55rem;text-align:center;padding:.5rem;
-  background:linear-gradient(150deg, color-mix(in srgb, var(--gc1) 12%, var(--surface)), var(--surface));
+.reviews-block{margin-top:2rem}
+.reviews-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.9rem;flex-wrap:wrap}
+.reviews-head h4{font-family:var(--f-pixel);font-size:.65rem;color:var(--ink-faint);letter-spacing:.06em;margin:0}
+.reviews-head a{font-size:.8rem;color:var(--gc1);text-decoration:none;font-weight:700}
+.reviews-head a:hover{text-decoration:underline}
+.review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem}
+.review-card{
+  margin:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:.85rem;
 }
+.review-card p{margin:0;font-size:.88rem;line-height:1.5;color:var(--ink)}
+.review-card p::before{content:"\201C";color:var(--gc1);font-family:var(--f-display);font-weight:700;margin-right:.05em}
+.review-author{display:flex;align-items:center;gap:.45rem;font-size:.76rem;color:var(--ink-faint);flex-wrap:wrap}
+.review-author i{color:var(--gc1);font-size:.85rem}
+.review-author span:first-of-type{color:var(--ink-dim);font-weight:700}
+.review-via{opacity:.75}
+
+.store-note{
+  margin-top:2rem;padding:1.3rem 1.5rem;border-radius:var(--radius-sm);
+  background:linear-gradient(150deg, color-mix(in srgb, var(--gc1) 12%, var(--surface)), var(--surface));
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:1.2rem;flex-wrap:wrap;
+}
+.store-note p{color:var(--ink-dim);font-size:.92rem;max-width:38ch;flex:1}
 
 /* ---------- toast ---------- */
 .toast{
@@ -464,5 +489,5 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
   .nav-toggle{display:flex}
   .cart-grid{grid-template-columns:1fr}
   .press-strip{grid-template-columns:1fr 1fr}
-  .shot-grid{grid-template-columns:1fr}
+  .review-grid{grid-template-columns:1fr}
 }
