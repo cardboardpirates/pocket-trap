@@ -201,6 +201,17 @@
   var viewHome = document.getElementById("view-home");
   var viewGame = document.getElementById("view-game");
   var gameContent = document.getElementById("gameContent");
+  var routeAnnouncer = document.getElementById("routeAnnouncer");
+
+  function announceRoute(msg){
+    routeAnnouncer.textContent = "";
+    window.setTimeout(function(){ routeAnnouncer.textContent = msg; }, 50);
+  }
+
+  function focusHeading(view){
+    var h = view.querySelector("h1");
+    if (h) h.focus({ preventScroll: true });
+  }
 
   function renderGame(id){
     var g = GAMES[id];
@@ -220,7 +231,7 @@
               '<span class="game-badge">CART. ' + g.year + '</span>' +
               '<span class="game-genre">' + (GENRE_ICONS[id] || '') + '<span>' + g.tag[lang] + '</span></span>' +
             '</div>' +
-            '<h1>' + g.title + '</h1>' +
+            '<h1 tabindex="-1">' + g.title + '</h1>' +
             '<p class="game-tagline">' + g.tagline[lang] + '</p>' +
             '<a class="btn btn-primary game-hero-cta" href="#plataformas">' +
               '<span>' + (lang === "pt" ? "Ver onde comprar" : "See where to buy") + '</span>' +
@@ -273,7 +284,7 @@
           '</div>' +
           '<div class="info-card">' +
             '<h2>' + (lang === "pt" ? "DESENVOLVEDOR" : "DEVELOPER") + '</h2>' +
-            '<p style="color:var(--ink-dim);font-size:.9rem">Pocket Trap · São Paulo, Brasil</p>' +
+            '<p style="color:var(--ink-dim);font-size:.9rem">' + (lang === "pt" ? "Pocket Trap · São Paulo, Brasil" : "Pocket Trap · São Paulo, Brazil") + '</p>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -291,6 +302,8 @@
       viewGame.classList.add("booting");
     }
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    focusHeading(viewGame);
+    announceRoute((lang === "pt" ? "Agora vendo: " : "Now viewing: ") + GAMES[id].title);
     if (!opts.fromHash && location.hash !== "#jogo/" + id) {
       location.hash = "jogo/" + id;
     }
@@ -302,6 +315,8 @@
     viewGame.classList.remove("active");
     viewHome.classList.add("active");
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    focusHeading(viewHome);
+    announceRoute(lang === "pt" ? "Voltou para a página inicial" : "Back to the home page");
     if (!opts.fromHash && location.hash) {
       history.pushState("", document.title, location.pathname + location.search);
     }
