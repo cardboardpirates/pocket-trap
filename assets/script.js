@@ -130,6 +130,7 @@
         '<div class="cart-body">' +
           '<h3>Projeto Kaepora</h3>' +
         '</div>' +
+        '<div class="cart-connector" aria-hidden="true"></div>' +
       '</button>'
     );
     var kaeporaCart = document.getElementById("kaeporaCart");
