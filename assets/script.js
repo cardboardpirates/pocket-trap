@@ -137,8 +137,8 @@
     kaeporaCart.addEventListener("click", function(){
       showToast(lang === "pt" ? "Projeto Kaepora: em breve..." : "Project Kaepora: coming soon...");
     });
-    var jogosSection = document.getElementById("jogos");
-    if (jogosSection) jogosSection.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    kaeporaCart.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+    showToast(lang === "pt" ? "Um jogo novo?!" : "A new game?!");
   }
 
   /* ---------- reveal on scroll ---------- */
