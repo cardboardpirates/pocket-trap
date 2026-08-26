@@ -179,7 +179,7 @@ img{max-width:100%;display:block}
   width:100vw;margin-inline:calc(50% - 50vw);
   min-height:clamp(460px,58vw,640px);
   display:flex;align-items:center;
-  overflow:hidden;
+  overflow:visible;
 }
 /* ---------- cinematic scene media (fundo + elemento flutuante), reaproveitado no
    hero da home, no hero de jogo com arte e na seção do Ninjin ---------- */
@@ -195,21 +195,40 @@ img{max-width:100%;display:block}
     linear-gradient(to top, var(--bg) 0%, transparent 22%);
 }
 .scene-media-char{
-  position:absolute;right:4%;bottom:0;height:92%;width:auto;max-width:52%;
+  position:absolute;right:0;top:0;height:120%;width:auto;max-width:64%;
   object-fit:contain;object-position:bottom;
   animation:scene-float 4.5s ease-in-out infinite;
   transition:opacity .5s ease;
 }
 @keyframes scene-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
 @media (prefers-reduced-motion:reduce){.scene-media-char{animation:none}}
+
+/* hero da Home: sombra da esquerda de volta, só que mais sutil que a original */
+.hero .scene-media-bg::after{
+  background-image:
+    linear-gradient(100deg, color-mix(in srgb, var(--bg) 78%, transparent) 0%, color-mix(in srgb, var(--bg) 50%, transparent) 46%, transparent 75%),
+    linear-gradient(to top, var(--bg) 0%, transparent 22%);
+}
+
+/* hero da Home: desligado por padrão (grayscale, parado); "Ligar o console" ativa cor + animação */
+.hero .scene-media-bg,
+.hero .scene-media-char{
+  filter:grayscale(1);
+  transition:filter .5s ease, opacity .5s ease;
+}
+.hero .scene-media-char{animation-play-state:paused}
+.hero.is-powered .scene-media-bg,
+.hero.is-powered .scene-media-char{filter:grayscale(0)}
+.hero.is-powered .scene-media-char{animation-play-state:running}
+
 .hero-inner{position:relative;z-index:1;width:100%}
-.hero-copy{max-width:min(46ch,100%)}
+.hero-copy{max-width:min(47ch,100%)}
 .hero-copy .eyebrow{margin-bottom:1.1rem}
 .hero h1{font-size:var(--fs-hero);line-height:1.02;margin-bottom:1.15rem}
 .hero h1 em{
   font-style:normal;color:var(--accent);
 }
-.hero-sub{color:var(--ink-dim);font-size:1.1rem;max-width:46ch;margin-bottom:1.9rem}
+.hero-sub{color:var(--ink-faint);font-size:1.1rem;max-width:46ch;margin-bottom:1.9rem}
 .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem}
 
 #view-home.booting .scene-media,
@@ -227,6 +246,7 @@ img{max-width:100%;display:block}
 
 /* ---------- sections ---------- */
 section{padding-block:clamp(3rem,7vw,5.5rem)}
+#jogos, #sobre, #imprensa, #contato{scroll-margin-top:110px}
 .section-head{
   display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;
   margin-bottom:clamp(2rem,4vw,3rem);
@@ -268,20 +288,45 @@ section{padding-block:clamp(3rem,7vw,5.5rem)}
 
 .cart-art{
   aspect-ratio:16/10;border-radius:var(--radius-sm);
-  background:
-    radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--c2) 55%, transparent), transparent 60%),
-    linear-gradient(135deg, color-mix(in srgb, var(--c1) 65%, var(--surface-2)), var(--surface-2));
+  background-color:var(--surface-2);background-size:cover;background-position:center;
   position:relative;overflow:hidden;
   display:flex;align-items:flex-end;padding:.85rem;
 }
 .cart-art::before{
   content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 2px, transparent 2px 10px);
+  background:rgba(0,0,0,0);
+  transition:background .25s ease;
+}
+.cart:hover .cart-art::before,
+.cart:focus-visible .cart-art::before{
+  background:rgba(0,0,0,.7);
 }
 .cart-notch{
   font-family:var(--f-pixel);font-size:var(--fs-micro);color:rgba(255,255,255,.85);
   background:rgba(0,0,0,.35);padding:.35rem .55rem;border-radius:6px;position:relative;z-index:1;
 }
+.cart-art-logo{
+  position:absolute;inset:0;margin:auto;
+  max-width:72%;max-height:58%;width:auto;height:auto;object-fit:contain;
+  opacity:0;transition:opacity .25s ease;z-index:1;
+}
+.cart:hover .cart-art-logo,
+.cart:focus-visible .cart-art-logo{opacity:1}
+
+/* cartucho secreto (easter egg), sem keyart própria ainda */
+.cart-art--mystery{background:linear-gradient(135deg, var(--surface-2), var(--bg-2))}
+.cart-art--mystery svg{
+  position:absolute;inset:0;margin:auto;
+  width:40px;height:40px;color:var(--ink-faint);opacity:.7;
+}
+@keyframes cart-pop-in{
+  0%{opacity:0;transform:scale(.6) translateY(24px)}
+  60%{opacity:1;transform:scale(1.06) translateY(-4px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+.cart-pop-in{animation:cart-pop-in .6s cubic-bezier(.2,.9,.3,1.3)}
+@media (prefers-reduced-motion:reduce){.cart-pop-in{animation:none}}
+
 .cart-body{display:flex;flex-direction:column;gap:.55rem;flex:1}
 .cart-tag{font-family:var(--f-pixel);font-size:var(--fs-micro);color:var(--c1)}
 .cart h3{font-size:var(--fs-h3)}
@@ -303,17 +348,21 @@ section{padding-block:clamp(3rem,7vw,5.5rem)}
   display:flex;align-items:center;
   overflow:hidden;
 }
-.transmedia-inner{position:relative;z-index:1;width:100%;max-width:min(46ch,100%)}
-.transmedia-inner .eyebrow{margin-bottom:1.1rem;color:var(--ink-dim);text-shadow:0 1px 8px rgba(0,0,0,.6)}
-.transmedia-inner h2{font-size:var(--fs-h3);margin-bottom:.7rem;text-shadow:0 2px 12px rgba(0,0,0,.5)}
-.transmedia-inner p{color:var(--ink);margin-bottom:1.3rem;text-shadow:0 1px 8px rgba(0,0,0,.55)}
+.transmedia-inner{position:relative;z-index:1;width:100%}
+.transmedia-copy{max-width:min(46ch,100%)}
+.transmedia-copy .eyebrow{margin-bottom:1.1rem;color:var(--ink-dim);text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.transmedia-copy h2{font-size:var(--fs-h3);margin-bottom:.7rem;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.transmedia-copy p{color:var(--ink);margin-bottom:1.3rem;text-shadow:0 1px 8px rgba(0,0,0,.55)}
 .transmedia-logo{display:block;height:clamp(64px,10vw,110px);width:auto;max-width:60%;margin-bottom:1.3rem}
 /* scrim mais forte pras seções de texto mais baixas (transmedia + hero da série),
    que têm menos altura pro degradê padrão terminar de escurecer antes do texto */
-.transmedia .scene-media-bg::after,
 .transmedia-hero .scene-media-bg::after{
   background:linear-gradient(100deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 46%, color-mix(in srgb, var(--bg) 55%, transparent) 68%, color-mix(in srgb, var(--bg) 15%, transparent) 88%),
     linear-gradient(to top, var(--bg) 0%, transparent 26%);
+}
+/* banner secundário (não é um hero principal): sem sombra vinda de baixo */
+.transmedia .scene-media-bg::after{
+  background:linear-gradient(100deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 46%, color-mix(in srgb, var(--bg) 55%, transparent) 68%, color-mix(in srgb, var(--bg) 15%, transparent) 88%);
 }
 
 /* ---------- about ---------- */
@@ -370,16 +419,13 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
   padding-block:2.2rem;
 }
 .social-row{display:flex;gap:.6rem}
-.social-row a, .social-row .social-soon{
+.social-row a{
   width:44px;height:44px;border-radius:10px;border:1px solid var(--line-strong);
   display:flex;align-items:center;justify-content:center;
   font-size:.95rem;text-decoration:none;color:var(--ink-dim);
   transition:all .15s ease;
 }
 .social-row a:hover{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
-.social-row .social-soon{
-  color:var(--ink-faint);border-style:dashed;cursor:default;opacity:.7;
-}
 .fine-print{font-size:.8rem;color:var(--ink-faint)}
 
 /* ---------- game view ---------- */
@@ -430,10 +476,11 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
   border-radius:0;border:none;background:none;padding:0;
   min-height:clamp(460px,58vw,620px);
   display:flex;align-items:center;
+  overflow:visible;
 }
 .game-hero--scene::before{display:none}
 .game-hero--scene .game-hero-inner{
-  display:block;position:relative;z-index:1;
+  display:block;position:relative;z-index:1;width:100%;
   padding-block:clamp(2.2rem,5vw,3.5rem);
 }
 .game-hero--scene .game-hero-copy{max-width:min(52ch,100%)}
@@ -455,6 +502,10 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
 }
 .transmedia-closing-inner{position:relative;z-index:1;max-width:min(46ch,100%)}
 .transmedia-closing-inner p{color:var(--ink);font-size:1.1rem;margin-bottom:1.3rem;max-width:44ch}
+/* banner secundário (não é um hero principal): sem sombra vinda de baixo */
+.transmedia-closing .scene-media-bg::after{
+  background:linear-gradient(100deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 80%, transparent) 38%, transparent 68%);
+}
 
 .game-console{
   position:relative;z-index:1;
@@ -575,6 +626,7 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
 @media (max-width:760px){
   .topbar-inner{padding-block:.75rem}
   .logo img{height:60px}
+  #jogos, #sobre, #imprensa, #contato{scroll-margin-top:75px}
   .hero{min-height:420px}
   .game-hero--scene, .transmedia{min-height:420px}
   .transmedia-closing{min-height:260px}

@@ -72,17 +72,73 @@
     navToggle.setAttribute("aria-expanded", open ? "true" : "false");
   });
   navLinks.querySelectorAll("a").forEach(function(a){
-    a.addEventListener("click", function(){ navLinks.classList.remove("open"); });
+    a.addEventListener("click", function(e){
+      navLinks.classList.remove("open");
+      var href = a.getAttribute("href");
+      if ((currentGame || currentSeries) && href && href.charAt(0) === "#") {
+        e.preventDefault();
+        goHomeToAnchor(href);
+      }
+    });
   });
 
-  /* ---------- boot replay ---------- */
-  document.getElementById("bootBtn").addEventListener("click", function(){
-    var home = document.getElementById("view-home");
-    if (reduceMotion) return;
-    home.classList.remove("booting");
-    void home.offsetWidth;
-    home.classList.add("booting");
+  /* ---------- liga/desliga o console (cor + animação do hero da Home) ---------- */
+  var heroMedia = document.getElementById("heroMedia");
+  var bootBtn = document.getElementById("bootBtn");
+  var bootBtnLabel = bootBtn.querySelector(".i18n");
+  var consolePowered = false;
+  var bootClickCount = 0;
+  var kaeporaRevealed = false;
+  var BOOT_LABEL_OFF = { pt: "Ligar o console", en: "Power on" };
+  var BOOT_LABEL_ON = { pt: "Desligar o console", en: "Power off" };
+
+  function setBootLabel(){
+    var pair = consolePowered ? BOOT_LABEL_ON : BOOT_LABEL_OFF;
+    bootBtnLabel.dataset.pt = pair.pt;
+    bootBtnLabel.dataset.en = pair.en;
+    bootBtnLabel.textContent = pair[lang];
+  }
+
+  bootBtn.addEventListener("click", function(){
+    consolePowered = !consolePowered;
+    heroMedia.classList.toggle("is-powered", consolePowered);
+    setBootLabel();
+    if (consolePowered) startHeroCarousel(); else stopHeroCarousel();
+    if (!reduceMotion) {
+      var home = document.getElementById("view-home");
+      home.classList.remove("booting");
+      void home.offsetWidth;
+      home.classList.add("booting");
+    }
+    bootClickCount++;
+    if (bootClickCount === 6 && !kaeporaRevealed) {
+      kaeporaRevealed = true;
+      revealKaepora();
+    }
   });
+
+  /* ---------- easter egg: 6º clique no boot revela um 4º cartucho secreto ---------- */
+  function revealKaepora(){
+    var cartGrid = document.querySelector(".cart-grid");
+    if (!cartGrid) return;
+    cartGrid.insertAdjacentHTML("beforeend",
+      '<button class="cart cart-pop-in" type="button" id="kaeporaCart">' +
+        '<div class="cart-art cart-art--mystery">' +
+          '<span class="cart-notch">2027</span>' +
+          CONSOLE_GLYPH_SVG +
+        '</div>' +
+        '<div class="cart-body">' +
+          '<h3>Projeto Kaepora</h3>' +
+        '</div>' +
+      '</button>'
+    );
+    var kaeporaCart = document.getElementById("kaeporaCart");
+    kaeporaCart.addEventListener("click", function(){
+      showToast(lang === "pt" ? "Projeto Kaepora: em breve..." : "Project Kaepora: coming soon...");
+    });
+    var jogosSection = document.getElementById("jogos");
+    if (jogosSection) jogosSection.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+  }
 
   /* ---------- reveal on scroll ---------- */
   if ("IntersectionObserver" in window) {
@@ -221,21 +277,25 @@
     heroMediaChar.src = slide.character;
   }
 
-  if (HERO_SLIDES.length) {
-    applyHeroSlide(0);
-    if (HERO_SLIDES.length > 1 && !reduceMotion) {
-      window.setInterval(function(){
-        heroMediaBg.style.opacity = 0;
-        heroMediaChar.style.opacity = 0;
-        window.setTimeout(function(){
-          heroSlideIndex = (heroSlideIndex + 1) % HERO_SLIDES.length;
-          applyHeroSlide(heroSlideIndex);
-          heroMediaBg.style.opacity = 1;
-          heroMediaChar.style.opacity = 1;
-        }, 500);
-      }, 7000);
-    }
+  var heroCarouselTimer = null;
+  function startHeroCarousel(){
+    if (heroCarouselTimer || HERO_SLIDES.length <= 1 || reduceMotion) return;
+    heroCarouselTimer = window.setInterval(function(){
+      heroMediaBg.style.opacity = 0;
+      heroMediaChar.style.opacity = 0;
+      window.setTimeout(function(){
+        heroSlideIndex = (heroSlideIndex + 1) % HERO_SLIDES.length;
+        applyHeroSlide(heroSlideIndex);
+        heroMediaBg.style.opacity = 1;
+        heroMediaChar.style.opacity = 1;
+      }, 500);
+    }, 7000);
   }
+  function stopHeroCarousel(){
+    if (heroCarouselTimer) { window.clearInterval(heroCarouselTimer); heroCarouselTimer = null; }
+  }
+
+  if (HERO_SLIDES.length) applyHeroSlide(0);
 
   /* Ícones reais do Font Awesome (CDN carregado no <head> do index.html). O
      Font Awesome Free não publica um ícone oficial de Nintendo/Switch, então
@@ -524,6 +584,21 @@
   function goHome(){
     if (currentGame) closeGame();
     if (currentSeries) closeSeries();
+  }
+
+  /* volta pra Home e rola até uma âncora de seção (ex.: clicar em "Sobre" no
+     menu enquanto está numa página de jogo/série, onde a âncora não existe
+     visível no DOM da view atual) */
+  function goHomeToAnchor(hash){
+    currentGame = null;
+    currentSeries = null;
+    showView(viewHome);
+    void viewHome.offsetHeight; /* força o layout a recalcular antes de rolar */
+    focusHeading(viewHome);
+    announceRoute(lang === "pt" ? "Voltou para a página inicial" : "Back to the home page");
+    history.pushState("", document.title, location.pathname + location.search + hash);
+    var target = document.querySelector(hash);
+    if (target) target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
   }
 
   /* ---------- hash routing: back/refresh/deep-link to a game or series page ---------- */
