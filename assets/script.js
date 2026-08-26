@@ -423,13 +423,6 @@
               }).join('') +
             '</div>' +
           '</div>' +
-          '<div class="store-note">' +
-            '<p>' + (lang === "pt" ? "Quer ver o jogo rodando antes? As capturas de tela oficiais estão na loja." : "Want to see it running first? Official screenshots are on the store page.") + '</p>' +
-            '<a class="btn btn-ghost btn-sm" href="' + storeUrl + '" target="_blank" rel="noopener noreferrer">' +
-              '<span>' + (lang === "pt" ? "Ver capturas na loja" : "See screenshots on the store") + '</span>' +
-              EXT_ICON +
-            '</a>' +
-          '</div>' +
         '</div>' +
         '<div class="game-side">' +
           '<div class="info-card info-card--primary" id="plataformas">' +
@@ -442,9 +435,13 @@
               '</a>';
             }).join('') + '</div>' +
           '</div>' +
-          '<div class="info-card">' +
-            '<h2>' + (lang === "pt" ? "DESENVOLVEDOR" : "DEVELOPER") + '</h2>' +
-            '<p style="color:var(--ink-dim);font-size:.9rem">' + (lang === "pt" ? "Pocket Trap · São Paulo, Brasil" : "Pocket Trap · São Paulo, Brazil") + '</p>' +
+          '<div class="info-card store-note">' +
+            '<h2>' + (lang === "pt" ? "CAPTURAS DE TELA" : "SCREENSHOTS") + '</h2>' +
+            '<p>' + (lang === "pt" ? "Quer ver o jogo rodando antes? As capturas de tela oficiais estão na loja." : "Want to see it running first? Official screenshots are on the store page.") + '</p>' +
+            '<a class="btn btn-ghost btn-sm" href="' + storeUrl + '" target="_blank" rel="noopener noreferrer">' +
+              '<span>' + (lang === "pt" ? "Ver capturas na loja" : "See screenshots on the store") + '</span>' +
+              EXT_ICON +
+            '</a>' +
           '</div>' +
         '</div>' +
       '</div>';

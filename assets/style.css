@@ -1,13 +1,16 @@
 :root{
-  --bg:#151221;
-  --bg-2:#0f0c1a;
-  --surface:#1e1830;
-  --surface-2:#271f3d;
+  /* Neutros num azul-violeta bem dessaturado (~H253°), quase oposto ao matiz
+     do --accent (~H74°) — a paleta escura e o verde-limão são complementares
+     de propósito; a saturação baixa evita que o fundo pareça "pintado de roxo". */
+  --bg:#17161d;
+  --bg-2:#110f14;
+  --surface:#211e2a;
+  --surface-2:#2b2736;
   --line:rgba(244,239,228,.12);
   --line-strong:rgba(244,239,228,.22);
   --ink:#F4EFE4;
-  --ink-dim:#a89bc9;
-  --ink-faint:#9185b2;
+  --ink-dim:#ada7be;
+  --ink-faint:#9690a7;
   --accent:#D6FF4F;
   --accent-ink:#1a1a08;
   --ninjin:#FF8A3D;
@@ -203,6 +206,9 @@ img{max-width:100%;display:block}
 @keyframes scene-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
 @media (prefers-reduced-motion:reduce){.scene-media-char{animation:none}}
 
+/* hero de jogo: personagem um pouco mais pra dentro/esquerda que o padrão */
+.game-hero--scene .scene-media-char{right:7%}
+
 /* hero da Home: sombra da esquerda de volta, só que mais sutil que a original */
 .hero .scene-media-bg::after{
   background-image:
@@ -373,20 +379,15 @@ section{padding-block:clamp(3rem,7vw,5.5rem)}
   aspect-ratio:1/1;border-radius:var(--radius);
   background:linear-gradient(150deg,var(--surface-2),var(--bg-2));
   border:1px solid var(--line-strong);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6rem;
+  padding:2rem;overflow:hidden;
 }
-.about-visual .rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.about-visual .rings span{
-  position:absolute;border:1px dashed var(--line-strong);border-radius:50%;
-  animation:spin 40s linear infinite;
-}
-.about-visual .rings span:nth-child(1){width:60%;height:60%}
-.about-visual .rings span:nth-child(2){width:80%;height:80%;animation-duration:60s;animation-direction:reverse}
-.about-visual .rings span:nth-child(3){width:100%;height:100%;animation-duration:80s}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.about-visual .rings span{animation:none}}
-.about-visual strong{font-family:var(--f-pixel);color:var(--accent);font-size:.7rem;letter-spacing:.08em;position:relative;z-index:1;text-align:center;padding:0 2rem}
+.about-visual .cart-shelf{display:flex;align-items:flex-end;justify-content:center;gap:.9rem}
+.about-visual .cart-shelf svg{width:clamp(34px,8vw,52px);height:auto;flex-shrink:0}
+.about-visual .cart-shelf svg:nth-child(1){color:var(--ninjin);transform:rotate(-8deg) translateY(6px)}
+.about-visual .cart-shelf svg:nth-child(2){color:var(--dodge);transform:translateY(-6px)}
+.about-visual .cart-shelf svg:nth-child(3){color:var(--pipi);transform:rotate(8deg) translateY(6px)}
+.about-visual strong{font-family:var(--f-pixel);color:var(--accent);font-size:.7rem;letter-spacing:.08em;text-align:center;padding:0 1rem}
 
 .about-copy p{color:var(--ink-dim);margin-bottom:1.1rem;max-width:56ch}
 .stat-row{display:flex;gap:clamp(1.5rem,4vw,3rem);margin-top:1.6rem;flex-wrap:wrap}
@@ -558,7 +559,7 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
 .game-side{display:flex;flex-direction:column;gap:1.6rem}
 .info-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:1.4rem}
 .info-card--primary{border-color:var(--gc1);scroll-margin-top:90px}
-.info-card h2{font-family:var(--f-pixel);font-size:.7rem;color:var(--ink-faint);letter-spacing:.04em;margin-bottom:.9rem}
+.info-card h2{font-family:var(--f-body);font-size:.8rem;font-weight:800;text-transform:uppercase;color:var(--ink-faint);letter-spacing:.01em;margin-bottom:.9rem}
 .platform-badges{display:flex;flex-direction:column;gap:.55rem}
 .platform-badge{
   display:flex;align-items:center;gap:.7rem;
@@ -576,7 +577,7 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
 
 .reviews-block{margin-top:2rem}
 .reviews-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.9rem;flex-wrap:wrap}
-.reviews-head h2{font-family:var(--f-pixel);font-size:.7rem;color:var(--ink-faint);letter-spacing:.04em;margin:0}
+.reviews-head h2{font-family:var(--f-body);font-size:.8rem;font-weight:800;text-transform:uppercase;color:var(--ink-faint);letter-spacing:.01em;margin:0}
 .reviews-head a{font-size:.8rem;color:var(--gc1);text-decoration:none;font-weight:700}
 .reviews-head a:hover{text-decoration:underline}
 .review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem}
@@ -591,13 +592,7 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
 .review-author span:first-of-type{color:var(--ink-dim);font-weight:700}
 .review-via{opacity:.75}
 
-.store-note{
-  margin-top:2rem;padding:1.3rem 1.5rem;border-radius:var(--radius-sm);
-  background:linear-gradient(150deg, color-mix(in srgb, var(--gc1) 12%, var(--surface)), var(--surface));
-  border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:space-between;gap:1.2rem;flex-wrap:wrap;
-}
-.store-note p{color:var(--ink-dim);font-size:.92rem;max-width:38ch;flex:1}
+.store-note p{color:var(--ink-dim);font-size:.92rem;margin-bottom:1rem}
 
 /* ---------- toast ---------- */
 .toast{
