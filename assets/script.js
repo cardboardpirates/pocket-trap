@@ -335,6 +335,7 @@
   var viewHome = document.getElementById("view-home");
   var viewGame = document.getElementById("view-game");
   var viewSeries = document.getElementById("view-series");
+  document.body.classList.toggle("is-home", viewHome.classList.contains("active"));
   var gameContent = document.getElementById("gameContent");
   var seriesContent = document.getElementById("seriesContent");
   var routeAnnouncer = document.getElementById("routeAnnouncer");
@@ -351,6 +352,7 @@
 
   function showView(view){
     [viewHome, viewGame, viewSeries].forEach(function(v){ v.classList.toggle("active", v === view); });
+    document.body.classList.toggle("is-home", view === viewHome);
   }
 
   function renderGame(id){
