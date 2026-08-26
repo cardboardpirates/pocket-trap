@@ -145,6 +145,10 @@ img{max-width:100%;display:block}
 .topbar-controls{order:3;justify-self:end;display:flex;align-items:center;gap:.6rem}
 /* só faz sentido na Home (liga/desliga a cena do hero) */
 body:not(.is-home) #bootBtn{display:none}
+/* largura fixa: "Ligar"/"Desligar"/"Power on"/"Power off" têm tamanhos
+   diferentes, sem isso o botão (e o que vem depois dele) pula de lugar
+   ao trocar de idioma ou clicar */
+#bootBtn{min-width:112px;justify-content:center}
 .boot-icon{display:none;width:18px;height:18px;flex:none}
 .lang-toggle{
   display:flex;border:1px solid var(--line-strong);border-radius:999px;padding:3px;background:var(--surface);
@@ -659,7 +663,7 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
   .nav-toggle{display:flex}
   /* vira um botão de ícone compacto pra caber ao lado do PT/EN e do menu */
   #bootBtn{
-    padding:0;width:40px;height:40px;border-radius:10px;
+    padding:0;width:40px;height:40px;min-width:40px;border-radius:10px;
     background:var(--surface);justify-content:center;
   }
   #bootBtn .boot-icon{display:inline-flex}

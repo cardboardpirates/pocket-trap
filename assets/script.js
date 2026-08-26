@@ -89,8 +89,8 @@
   var consolePowered = false;
   var bootClickCount = 0;
   var kaeporaRevealed = false;
-  var BOOT_LABEL_OFF = { pt: "Ligar o console", en: "Power on" };
-  var BOOT_LABEL_ON = { pt: "Desligar o console", en: "Power off" };
+  var BOOT_LABEL_OFF = { pt: "Ligar", en: "Power on" };
+  var BOOT_LABEL_ON = { pt: "Desligar", en: "Power off" };
 
   function setBootLabel(){
     var pair = consolePowered ? BOOT_LABEL_ON : BOOT_LABEL_OFF;
