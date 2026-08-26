@@ -214,7 +214,10 @@ body:not(.is-home) #bootBtn{display:none}
 @media (prefers-reduced-motion:reduce){.scene-media-char{animation:none}}
 
 /* hero de jogo: personagem um pouco mais pra dentro/esquerda que o padrão */
-.game-hero--scene .scene-media-char{right:7%}
+.game-hero--scene .scene-media-char{right:13%}
+
+/* hero da Home: personagem puxado pra mais perto do texto */
+.hero .scene-media-char{right:9%}
 
 /* hero da Home: sombra da esquerda de volta, só que mais sutil que a original */
 .hero .scene-media-bg::after{
@@ -651,7 +654,9 @@ footer{border-top:1px solid var(--line);margin-top:1rem}
     background:linear-gradient(180deg, color-mix(in srgb, var(--bg) 55%, transparent) 0%, var(--bg) 78%),
       linear-gradient(100deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 88%, transparent) 55%, color-mix(in srgb, var(--bg) 40%, transparent) 100%);
   }
-  .scene-media-char{max-width:70%;height:52%;right:2%}
+  .scene-media-char,
+  .hero .scene-media-char,
+  .game-hero--scene .scene-media-char{max-width:70%;height:52%;right:2%}
   .nav-links{
     position:fixed;inset:72px 1rem auto 1rem;
     background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--radius-sm);
